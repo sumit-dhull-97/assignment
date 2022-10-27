@@ -2,27 +2,54 @@
 #
 # https://gqlgen.com/getting-started/
 
-type Todo {
-  id: ID!
-  text: String!
-  done: Boolean!
-  user: User!
+
+
+input UserInput {
+  firstName: String!
+  lastName: String!
+  mobile: String
+  password: String!
 }
 
 type User {
   id: ID!
-  name: String!
+  firstName: String!
+  lastName: String!
+  mobile: String
+  sessionCred: String!
+}
+
+input LoginInput {
+  userId: ID!
+  password: String!
+}
+
+type Login {
+  sessionCred: String!
+}
+
+input LogoutInput {
+  userId: ID!
+  sessionCred: String!
+}
+
+input CheckSessionInput {
+  userId: ID!
+  sessionCred: String!
 }
 
 type Query {
-  todos: [Todo!]!
+  checkSession(input: CheckSessionInput!): SessionStatus
 }
 
-input NewTodo {
-  text: String!
-  userId: String!
-}
 
 type Mutation {
-  createTodo(input: NewTodo!): Todo!
+  login(input: LoginInput!): Login!
+  signup(input: UserInput!): User!
+  logout(input: LogoutInput): SessionStatus
+}
+
+enum SessionStatus {
+  OPEN
+  TERMINATED
 }

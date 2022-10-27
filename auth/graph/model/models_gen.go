@@ -2,19 +2,83 @@
 
 package model
 
-type NewTodo struct {
-	Text   string `json:"text"`
-	UserID string `json:"userId"`
+import (
+	"fmt"
+	"io"
+	"strconv"
+)
+
+type CheckSessionInput struct {
+	UserID      string `json:"userId"`
+	SessionCred string `json:"sessionCred"`
 }
 
-type Todo struct {
-	ID   string `json:"id"`
-	Text string `json:"text"`
-	Done bool   `json:"done"`
-	User *User  `json:"user"`
+type Login struct {
+	SessionCred string `json:"sessionCred"`
+}
+
+type LoginInput struct {
+	UserID   string `json:"userId"`
+	Password string `json:"password"`
+}
+
+type LogoutInput struct {
+	UserID      string `json:"userId"`
+	SessionCred string `json:"sessionCred"`
 }
 
 type User struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	ID          string  `json:"id"`
+	FirstName   string  `json:"firstName"`
+	LastName    string  `json:"lastName"`
+	Mobile      *string `json:"mobile"`
+	SessionCred string  `json:"sessionCred"`
+}
+
+type UserInput struct {
+	FirstName string  `json:"firstName"`
+	LastName  string  `json:"lastName"`
+	Mobile    *string `json:"mobile"`
+	Password  string  `json:"password"`
+}
+
+type SessionStatus string
+
+const (
+	SessionStatusOpen       SessionStatus = "OPEN"
+	SessionStatusTerminated SessionStatus = "TERMINATED"
+)
+
+var AllSessionStatus = []SessionStatus{
+	SessionStatusOpen,
+	SessionStatusTerminated,
+}
+
+func (e SessionStatus) IsValid() bool {
+	switch e {
+	case SessionStatusOpen, SessionStatusTerminated:
+		return true
+	}
+	return false
+}
+
+func (e SessionStatus) String() string {
+	return string(e)
+}
+
+func (e *SessionStatus) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = SessionStatus(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid SessionStatus", str)
+	}
+	return nil
+}
+
+func (e SessionStatus) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
 }
