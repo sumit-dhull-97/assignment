@@ -5,39 +5,59 @@ package graph
 
 import (
 	"context"
-	"fmt"
-
 	"github.com/sumit-dhull-97/assignment/auth/graph/generated"
 	"github.com/sumit-dhull-97/assignment/auth/graph/model"
-	"github.com/vektah/gqlparser/v2/gqlerror"
+	model2 "github.com/sumit-dhull-97/assignment/auth/model"
 )
 
 // Login is the resolver for the login field.
 func (r *mutationResolver) Login(ctx context.Context, input model.LoginInput) (*model.Login, error) {
-	return &model.Login{
-		SessionCred: "some",
-	}, nil
+	user := model2.User{ID: input.UserID, Password: input.Password}
+	output, err := r.Service.Login(&ctx, &user)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.Login{SessionCred: output.SessionCred}, err
 }
 
 // Signup is the resolver for the signup field.
 func (r *mutationResolver) Signup(ctx context.Context, input model.UserInput) (*model.User, error) {
-	return &model.User{
-		ID:          "fdggfgg",
-		FirstName:   input.FirstName,
-		LastName:    input.LastName,
-		Mobile:      input.Mobile,
-		SessionCred: "some",
-	}, nil
+	user := model2.User{FirstName: input.FirstName, LastName: input.LastName, Mobile: input.Mobile, Password: input.Password}
+
+	output, err := r.Service.Signup(&ctx, &user)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.User{ID: output.ID, FirstName: output.FirstName, LastName: output.LastName, Mobile: output.Mobile, SessionCred: output.SessionCred}, nil
 }
 
 // Logout is the resolver for the logout field.
 func (r *mutationResolver) Logout(ctx context.Context, input *model.LogoutInput) (*model.SessionStatus, error) {
-	return nil, gqlerror.Errorf("my error")
+	user := model2.User{ID: input.UserID, SessionCred: input.SessionCred}
+
+	output, err := r.Service.Logout(&ctx, &user)
+	if err != nil {
+		return nil, err
+	}
+
+	var ss = model.SessionStatus(output)
+	return &ss, nil
 }
 
 // CheckSession is the resolver for the checkSession field.
 func (r *queryResolver) CheckSession(ctx context.Context, input model.CheckSessionInput) (*model.SessionStatus, error) {
-	panic(fmt.Errorf("not implemented: CheckSession - checkSession"))
+	user := model2.User{ID: input.UserID, SessionCred: input.SessionCred}
+
+	output, err := r.Service.CheckSession(&ctx, &user)
+	if err != nil {
+		return nil, err
+	}
+
+	var ss = model.SessionStatus(output)
+	return &ss, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.
