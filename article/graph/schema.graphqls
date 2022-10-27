@@ -2,27 +2,42 @@
 #
 # https://gqlgen.com/getting-started/
 
-type Todo {
-  id: ID!
-  text: String!
-  done: Boolean!
-  user: User!
+input ArticleInput {
+  id: ID
+  title: String!
+  userId: String!
+  script: String!
+  hashtags: [String!]
+  sessionCred: String!
 }
 
-type User {
+type Article {
   id: ID!
-  name: String!
+  title: String!
+  userId: String!
+  script: String!
+  hashtags: [String!]
+  created: String!
+  published: String!
+}
+
+input GetAllInput {
+  userId: String!
+  sessionCred: String!
+}
+
+input DeleteInput {
+  userId: String!
+  articleId: String!
+  sessionCred: String!
 }
 
 type Query {
-  todos: [Todo!]!
+  getAll(input: GetAllInput!): [Article!]
 }
 
-input NewTodo {
-  text: String!
-  userId: String!
-}
 
 type Mutation {
-  createTodo(input: NewTodo!): Todo!
+  post(input: ArticleInput!): Article!
+  delete(input: DeleteInput!): String!
 }

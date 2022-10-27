@@ -6,19 +6,34 @@ package graph
 import (
 	"context"
 	"fmt"
+	model2 "github.com/sumit-dhull-97/assignment/article/model"
+	"github.com/sumit-dhull-97/assignment/article/store/postgres"
 
 	"github.com/sumit-dhull-97/assignment/article/graph/generated"
 	"github.com/sumit-dhull-97/assignment/article/graph/model"
 )
 
-// CreateTodo is the resolver for the createTodo field.
-func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
-	panic(fmt.Errorf("not implemented: CreateTodo - createTodo"))
+// Post is the resolver for the post field.
+func (r *mutationResolver) Post(ctx context.Context, input model.ArticleInput) (*model.Article, error) {
+	pg := postgres.GetDBConnection(&ctx)
+	article := &postgres.Article{DB: pg}
+
+	output := &model2.Article{ID: input.ID, UserID: input.UserID, Script: input.Script, Hashtags: input.Hashtags, Created: "2022-10-10"}
+
+	article.Create(&ctx, output)
+	//article.Delete(&ctx, input.ID)
+	article.ReadAll(&ctx, "scooby")
+	return nil, nil
 }
 
-// Todos is the resolver for the todos field.
-func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	panic(fmt.Errorf("not implemented: Todos - todos"))
+// Delete is the resolver for the delete field.
+func (r *mutationResolver) Delete(ctx context.Context, input model.DeleteInput) (string, error) {
+	panic(fmt.Errorf("not implemented: Delete - delete"))
+}
+
+// GetAll is the resolver for the getAll field.
+func (r *queryResolver) GetAll(ctx context.Context, input model.GetAllInput) ([]*model.Article, error) {
+	panic(fmt.Errorf("not implemented: GetAll - getAll"))
 }
 
 // Mutation returns generated.MutationResolver implementation.
