@@ -2,9 +2,10 @@ package postgres
 
 import (
 	"context"
+	"errors"
 	"fmt"
-	"github.com/gofrs/uuid"
-	"github.com/sumit-dhull-97/assignment/auth/graph/model"
+	"github.com/dgryski/trifles/uuid"
+	"github.com/sumit-dhull-97/assignment/auth/model"
 	"log"
 	"os"
 	"time"
@@ -12,29 +13,63 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
-type Auth struct {
+type User struct {
 	DB *pgxpool.Pool
 }
 
-func (a *Auth) Login(ctx *context.Context, input *model.LoginInput) (*model.Login, error) {
-	var pass string
-	err := a.DB.QueryRow(*ctx, "SELECT password FROM users WHERE id = $1", input.UserID).Scan(&pass)
+func (a *User) Create(ctx *context.Context, user *model.User) error {
+	user.ID = uuid.UUIDv4()
+	user.SessionCred = uuid.UUIDv4()
+
+	_, err := a.DB.Exec(*ctx, "INSERT INTO users (id, first_name, last_name, mobile, password, session_id) VALUES ($1, $2, $3, $4, $5, $6)",
+		user.ID, user.FirstName, user.LastName, user.Mobile, user.Password, user.SessionCred)
+
 	if err != nil {
-		log.Println(err, input)
-		return nil, err
+		fmt.Println(err, user)
+		return errors.New("failed to create user")
 	}
 
-	session, _ := uuid.NewV1()
+	return nil
+}
 
-	_, err = a.DB.Exec(*ctx, "UPDATE users SET session_id = $1 WHERE id = $2", session.String(), input.UserID)
+func (a *User) Read(ctx *context.Context, id string) (*model.User, error) {
+	user := model.User{}
+
+	err := a.DB.QueryRow(*ctx, "SELECT id, first_name, last_name, mobile, password, session_id FROM users WHERE id = $1", id).
+		Scan(&user.ID, &user.FirstName, &user.LastName, &user.Mobile, &user.Password, &user.SessionCred)
+
 	if err != nil {
-		log.Println(err, session, input)
-		return nil, err
+		fmt.Println(err, user)
+		return nil, errors.New("failed to read user")
 	}
 
-	return &model.Login{
-		SessionCred: session.String(),
-	}, nil
+	return &user, nil
+}
+
+func (a *User) Update(ctx *context.Context, user *model.User) error {
+
+	_, err := a.DB.Exec(*ctx, "UPDATE users SET first_name=$2, last_name=$3, mobile=$4, password=$5, session_id=$6 WHERE id=$1",
+		user.ID, user.FirstName, user.LastName, user.Mobile, user.Password, user.SessionCred)
+
+	if err != nil {
+		fmt.Println(err, user)
+		return errors.New("failed to update user")
+	}
+
+	return nil
+}
+
+func (a *User) Delete(ctx *context.Context, id string) (*model.User, error) {
+	user := model.User{}
+
+	_, err := a.DB.Exec(*ctx, "DELETE FROM users WHERE id = $1", id)
+
+	if err != nil {
+		fmt.Println(err, user)
+		return nil, errors.New("failed to delete user")
+	}
+
+	return &user, nil
 }
 
 func GetDBConnection(ctx *context.Context) *pgxpool.Pool {
