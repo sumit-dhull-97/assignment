@@ -2,6 +2,8 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/sumit-dhull-97/assignment/auth/service"
+	"github.com/sumit-dhull-97/assignment/auth/store/postgres"
 	"log"
 	"net/http"
 	"os"
@@ -30,17 +32,23 @@ func main() {
 }
 
 func graphqlHandler() gin.HandlerFunc {
-	h := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}))
 
 	return func(c *gin.Context) {
+		ctx := c.Request.Context()
+		pg := postgres.GetDBConnection(&ctx)
+		auth := &postgres.User{DB: pg}
+
+		serv := &service.AuthService{Store: auth}
+
+		h := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{Service: serv}}))
 		h.ServeHTTP(c.Writer, c.Request)
 	}
 }
 
 func playgroundHandler() gin.HandlerFunc {
-	h := playground.Handler("GraphQL", "/query")
 
 	return func(c *gin.Context) {
+		h := playground.Handler("GraphQL", "/query")
 		h.ServeHTTP(c.Writer, c.Request)
 	}
 }
