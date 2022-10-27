@@ -4,8 +4,8 @@ go 1.19
 
 require (
 	github.com/99designs/gqlgen v0.17.20
+	github.com/dgryski/trifles v0.0.0-20200323201526-dd97f9abfb48
 	github.com/gin-gonic/gin v1.8.1
-	github.com/gofrs/uuid v4.0.0+incompatible
 	github.com/jackc/pgx/v4 v4.17.2
 	github.com/vektah/gqlparser/v2 v2.5.1
 )

@@ -59,17 +59,16 @@ func (a *User) Update(ctx *context.Context, user *model.User) error {
 	return nil
 }
 
-func (a *User) Delete(ctx *context.Context, id string) (*model.User, error) {
-	user := model.User{}
+func (a *User) Delete(ctx *context.Context, id string) error {
 
 	_, err := a.DB.Exec(*ctx, "DELETE FROM users WHERE id = $1", id)
 
 	if err != nil {
-		fmt.Println(err, user)
-		return nil, errors.New("failed to delete user")
+		fmt.Println(err)
+		return errors.New("failed to delete user")
 	}
 
-	return &user, nil
+	return nil
 }
 
 func GetDBConnection(ctx *context.Context) *pgxpool.Pool {

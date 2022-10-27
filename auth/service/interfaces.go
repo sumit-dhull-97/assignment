@@ -1,10 +1,13 @@
 package service
 
-import "github.com/sumit-dhull-97/assignment/auth/graph/model"
+import (
+	"context"
+	"github.com/sumit-dhull-97/assignment/auth/model"
+)
 
 type Auth interface {
-	Login(input model.LoginInput) (model.Login, error)
-	Logout(input model.LogoutInput) (model.SessionStatus, error)
-	CheckSession(input model.CheckSessionInput) (model.SessionStatus, error)
-	Signup(input model.UserInput) (model.User, error)
+	Login(ctx *context.Context, input *model.User) (*model.User, error)
+	Logout(ctx *context.Context, input *model.User) (string, error)
+	CheckSession(ctx *context.Context, input *model.User) (string, error)
+	Signup(ctx *context.Context, input *model.User) (*model.User, error)
 }
