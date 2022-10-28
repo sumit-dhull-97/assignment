@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/dgryski/trifles/uuid"
 	"github.com/sumit-dhull-97/assignment/auth/model"
 	"log"
 	"os"
@@ -18,8 +17,6 @@ type User struct {
 }
 
 func (a *User) Create(ctx *context.Context, user *model.User) error {
-	user.ID = uuid.UUIDv4()
-	user.SessionCred = uuid.UUIDv4()
 
 	_, err := a.DB.Exec(*ctx, "INSERT INTO users (id, first_name, last_name, mobile, password, session_id) VALUES ($1, $2, $3, $4, $5, $6)",
 		user.ID, user.FirstName, user.LastName, user.Mobile, user.Password, user.SessionCred)

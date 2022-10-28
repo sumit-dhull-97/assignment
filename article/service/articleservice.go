@@ -93,7 +93,7 @@ func checkCredentials(userId, sessionCred string) error {
 
 	authPort := os.Getenv("AUTH_PORT")
 	if authPort == "" {
-		authPort = "8002"
+		authPort = "3000"
 	}
 
 	url := fmt.Sprintf("http://%s:%s/query", authHost, authPort)

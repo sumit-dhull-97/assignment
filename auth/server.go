@@ -14,7 +14,7 @@ import (
 	"github.com/sumit-dhull-97/assignment/auth/graph/generated"
 )
 
-const defaultPort = ":8080"
+const defaultPort = ":3000"
 
 func main() {
 	port := os.Getenv("PORT")
@@ -25,7 +25,7 @@ func main() {
 	router := gin.Default()
 	router.GET("/", playgroundHandler())
 	router.POST("/query", graphqlHandler())
-	router.Run()
+	router.Run(port)
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))

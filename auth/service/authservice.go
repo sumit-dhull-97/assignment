@@ -78,16 +78,3 @@ func (a *AuthService) Signup(ctx *context.Context, input *model.User) (*model.Us
 
 	return input, nil
 }
-
-//
-//func (a *AuthService) Logout(input *model.LogoutInput) (*model.SessionStatus, error) {
-//
-//}
-//
-//func (a *AuthService) CheckSession(input *model.CheckSessionInput) (*model.SessionStatus, error) {
-//
-//}
-//
-//func (a *AuthService) Signup(input *model.UserInput) (*model.User, error) {
-//
-//}
