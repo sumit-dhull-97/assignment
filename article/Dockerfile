@@ -9,15 +9,15 @@ RUN go mod download
 
 COPY . ./
 
-RUN go build -o /auth
+RUN go build -o /article
 
 ## Deploy
 FROM gcr.io/distroless/base-debian10
 
 WORKDIR /
 
-COPY --from=build /auth /auth
+COPY --from=build /article /article
 
-EXPOSE 3000
+EXPOSE 3001
 
-ENTRYPOINT ["/auth"]
+ENTRYPOINT ["/article"]
