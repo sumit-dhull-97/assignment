@@ -5,35 +5,46 @@ package graph
 
 import (
 	"context"
-	"fmt"
-	model2 "github.com/sumit-dhull-97/assignment/article/model"
-	"github.com/sumit-dhull-97/assignment/article/store/postgres"
-
 	"github.com/sumit-dhull-97/assignment/article/graph/generated"
 	"github.com/sumit-dhull-97/assignment/article/graph/model"
+	model2 "github.com/sumit-dhull-97/assignment/article/model"
 )
 
 // Post is the resolver for the post field.
 func (r *mutationResolver) Post(ctx context.Context, input model.ArticleInput) (*model.Article, error) {
-	pg := postgres.GetDBConnection(&ctx)
-	article := &postgres.Article{DB: pg}
+	article := model2.Article{ID: input.ID, UserID: input.UserID, Script: input.Script, Title: input.Title, Hashtags: input.Hashtags}
 
-	output := &model2.Article{ID: input.ID, UserID: input.UserID, Script: input.Script, Hashtags: input.Hashtags, Created: "2022-10-10"}
+	output, err := r.Service.Post(&ctx, &article, input.SessionCred)
+	if err != nil {
+		return nil, err
+	}
 
-	article.Create(&ctx, output)
-	//article.Delete(&ctx, input.ID)
-	article.ReadAll(&ctx, "scooby")
-	return nil, nil
+	return &model.Article{ID: output.ID, UserID: output.UserID, Script: output.Script, Title: output.Title, Hashtags: output.Hashtags,
+		Published: output.Published, Created: output.Created}, nil
 }
 
 // Delete is the resolver for the delete field.
 func (r *mutationResolver) Delete(ctx context.Context, input model.DeleteInput) (string, error) {
-	panic(fmt.Errorf("not implemented: Delete - delete"))
+	article := &model2.Article{ID: input.ArticleID, UserID: input.UserID}
+
+	return r.Service.Delete(&ctx, article, input.SessionCred)
 }
 
 // GetAll is the resolver for the getAll field.
 func (r *queryResolver) GetAll(ctx context.Context, input model.GetAllInput) ([]*model.Article, error) {
-	panic(fmt.Errorf("not implemented: GetAll - getAll"))
+	articles, err := r.Service.GetAll(&ctx, input.UserID, input.SessionCred)
+	if err != nil {
+		return nil, err
+	}
+
+	res := make([]*model.Article, 0, 1)
+	for _, v := range articles {
+		r := &model.Article{ID: v.ID, UserID: v.UserID, Script: v.Script, Title: v.Title, Hashtags: v.Hashtags,
+			Published: v.Published, Created: v.Created}
+		res = append(res, r)
+	}
+
+	return res, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.
