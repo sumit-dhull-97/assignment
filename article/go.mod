@@ -7,6 +7,7 @@ require (
 	github.com/dgryski/trifles v0.0.0-20200323201526-dd97f9abfb48
 	github.com/gin-gonic/gin v1.8.1
 	github.com/jackc/pgx/v4 v4.17.2
+	github.com/lib/pq v1.10.2
 	github.com/tidwall/gjson v1.14.3
 	github.com/vektah/gqlparser/v2 v2.5.1
 	golang.org/x/net v0.0.0-20220722155237-a158d28d115b
